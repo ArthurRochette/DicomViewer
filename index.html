@@ -288,32 +288,6 @@
             display: block;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
         .footer {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -411,8 +385,6 @@
         <div class="error" id="error"></div>
 
         <div class="tags-section" id="tagsSection">
-            <div class="stats" id="stats"></div>
-
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="🔍 Search for a tag (name, number or value)...">
             </div>
@@ -444,7 +416,6 @@
         const tagsSection = document.getElementById('tagsSection');
         const tagsContainer = document.getElementById('tagsContainer');
         const searchInput = document.getElementById('searchInput');
-        const stats = document.getElementById('stats');
 
         let currentDicomData = null;
 
@@ -532,35 +503,6 @@
         }
 
         function displayTags(dict) {
-            // Count tags recursively
-            let totalTags = 0;
-            let sequenceTags = 0;
-
-            function countTags(obj) {
-                for (const tag in obj) {
-                    totalTags++;
-                    const tagData = obj[tag];
-                    if (tagData.vr === 'SQ' && tagData.Value) {
-                        sequenceTags++;
-                        tagData.Value.forEach(item => countTags(item));
-                    }
-                }
-            }
-
-            countTags(dict);
-
-            // Display statistics
-            stats.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${totalTags}</div>
-                    <div class="stat-label">Total Tags</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${sequenceTags}</div>
-                    <div class="stat-label">Sequences</div>
-                </div>
-            `;
-
             // Display tags as tree
             tagsContainer.innerHTML = '';
             const treeDiv = document.createElement('div');
