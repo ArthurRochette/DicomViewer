@@ -448,8 +448,13 @@
             }
         });
 
+        // Debounce function to limit search frequency
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            filterTags(e.target.value);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterTags(e.target.value);
+            }, 150);
         });
 
         async function handleFile(file) {
@@ -546,7 +551,7 @@
                 tagData.Value.forEach((item, index) => {
                     const itemId = `${sequenceId}_item_${index}`;
 
-                    html += `<div class="tag-line">`;
+                    html += `<div class="tag-line" data-search="Item #${index + 1} ${tagName}">`;
                     html += `<span class="tag-indent">${'  '.repeat(level + 1)}</span>`;
                     html += `<span class="collapse-btn" onclick="toggleCollapse('${itemId}', this)">▶</span>`;
                     html += `<span class="item-marker">Item #${index + 1}:</span>`;
@@ -703,18 +708,87 @@
             const term = searchTerm.toLowerCase().trim();
             const tagLines = document.querySelectorAll('.tag-line');
 
+            // Reset all if no search term
             if (!term) {
-                tagLines.forEach(line => line.style.display = '');
+                tagLines.forEach(line => {
+                    line.style.display = '';
+                });
                 return;
             }
 
-            tagLines.forEach(line => {
-                const searchText = (line.dataset.search || '').toLowerCase();
-                if (searchText.includes(term)) {
-                    line.style.display = '';
-                } else {
-                    line.style.display = 'none';
-                }
+            // Use requestAnimationFrame for better performance
+            requestAnimationFrame(() => {
+                // Build a map of lines and their collapse buttons for O(1) lookup
+                const collapseButtons = new Map();
+                document.querySelectorAll('.collapse-btn').forEach(btn => {
+                    const onclickAttr = btn.getAttribute('onclick');
+                    if (onclickAttr) {
+                        const match = onclickAttr.match(/'([^']+)'/);
+                        if (match) {
+                            collapseButtons.set(match[1], btn);
+                        }
+                    }
+                });
+
+                const matchingLines = new Set();
+                const containersToExpand = new Set();
+                const linesToShow = new Set();
+
+                // Single pass: identify matches and collect parent containers
+                tagLines.forEach(line => {
+                    const searchText = (line.dataset.search || '').toLowerCase();
+
+                    if (searchText.includes(term)) {
+                        matchingLines.add(line);
+                        linesToShow.add(line);
+
+                        // Walk up the DOM tree to find collapsed parents
+                        let parent = line.parentElement;
+                        while (parent && parent !== document.body) {
+                            if (parent.classList.contains('collapsed-content')) {
+                                containersToExpand.add(parent);
+                                // Also mark the parent's header line as visible
+                                const parentLine = parent.previousElementSibling;
+                                if (parentLine && parentLine.classList.contains('tag-line')) {
+                                    linesToShow.add(parentLine);
+                                }
+                            }
+                            parent = parent.parentElement;
+                        }
+                    }
+                });
+
+                // Batch DOM updates
+                const fragment = document.createDocumentFragment();
+
+                // Expand containers (only those that need it)
+                containersToExpand.forEach(container => {
+                    if (container.classList.contains('collapsed-content')) {
+                        container.classList.remove('collapsed-content');
+                        // Update button using pre-built map
+                        const btn = collapseButtons.get(container.id);
+                        if (btn) {
+                            btn.textContent = '▼';
+                        }
+                    }
+                });
+
+                // Update visibility in a single pass
+                tagLines.forEach(line => {
+                    if (linesToShow.has(line)) {
+                        line.style.display = '';
+                    } else {
+                        // Check if it's a parent of matching elements
+                        const nextSibling = line.nextElementSibling;
+                        let hasMatchingDescendant = false;
+
+                        if (nextSibling && nextSibling.id && containersToExpand.has(nextSibling)) {
+                            hasMatchingDescendant = true;
+                        }
+
+                        line.style.display = hasMatchingDescendant ? '' : 'none';
+                    }
+                });
             });
         }
     </script>
