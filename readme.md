@@ -19,7 +19,7 @@ A simple web-based DICOM file viewer that displays DICOM tags in a human-readabl
 
 ## Privacy
 
-All processing happens locally in your browser. No data is sent to any server. You can download the .html file and use it offline in the browser of your choice, or you can use it from [arthurrochette.github.io/DicomViewer](https://arthurrochette.github.io/DicomViewer)
+All processing happens locally in your browser. No data is sent to any server. You can download the .html file and use it in the browser of your choice, or you can use it from [arthurrochette.github.io/DicomViewer](https://arthurrochette.github.io/DicomViewer)
 
 ## License
 
