@@ -50,6 +50,206 @@
             border-bottom: 2px solid #f0f0f0;
         }
 
+        .mode-switch {
+            padding: 20px 40px;
+            background: #f8f9ff;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mode-btn {
+            padding: 10px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #f0f2ff;
+        }
+
+        .compare-section {
+            padding: 40px;
+            display: none;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .compare-section.show {
+            display: block;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .compare-box {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px 20px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .compare-box:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .compare-box.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .compare-box.loaded {
+            border-color: #27ae60;
+            background: #e8f8f0;
+        }
+
+        .compare-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .compare-box p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .compare-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .diff-added {
+            background: #e6ffed !important;
+            border-left: 3px solid #28a745;
+        }
+
+        .diff-removed {
+            background: #ffe6e6 !important;
+            border-left: 3px solid #dc3545;
+        }
+
+        .diff-modified {
+            background: #fff3cd !important;
+            border-left: 3px solid #ffc107;
+        }
+
+        .diff-identical {
+            opacity: 0.4;
+        }
+
+        .diff-header {
+            background: #f8f9ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .diff-legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .diff-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .diff-legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .diff-legend-box.added {
+            background: #e6ffed;
+            border-color: #28a745;
+        }
+
+        .diff-legend-box.removed {
+            background: #ffe6e6;
+            border-color: #dc3545;
+        }
+
+        .diff-legend-box.modified {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .diff-value-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .diff-value {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .diff-value-label {
+            font-size: 0.8em;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .diff-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+        }
+
         .upload-box {
             border: 3px dashed #667eea;
             border-radius: 12px;
@@ -364,13 +564,44 @@
             <p>Human Readable Dicom</p>
         </div>
 
-        <div class="upload-section">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="singleModeBtn" onclick="switchMode('single')">Single File</button>
+            <button class="mode-btn" id="compareModeBtn" onclick="switchMode('compare')">Compare Files</button>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
             <div class="upload-box" id="uploadBox">
                 <h2>Drag and drop your DICOM file</h2>
                 <p>or click to select a file</p>
                 <input type="file" id="fileInput" accept=".dcm,.dicom,*">
                 <button class="btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
                     Choose a file
+                </button>
+            </div>
+        </div>
+
+        <div class="compare-section" id="compareSection">
+            <div class="compare-grid">
+                <div class="compare-box" id="compareBox1">
+                    <h3>First DICOM File</h3>
+                    <p id="file1Name">No file loaded</p>
+                    <input type="file" id="fileInput1" accept=".dcm,.dicom,*" style="display: none;">
+                    <button class="btn" onclick="event.stopPropagation(); document.getElementById('fileInput1').click()">
+                        Choose File 1
+                    </button>
+                </div>
+                <div class="compare-box" id="compareBox2">
+                    <h3>Second DICOM File</h3>
+                    <p id="file2Name">No file loaded</p>
+                    <input type="file" id="fileInput2" accept=".dcm,.dicom,*" style="display: none;">
+                    <button class="btn" onclick="event.stopPropagation(); document.getElementById('fileInput2').click()">
+                        Choose File 2
+                    </button>
+                </div>
+            </div>
+            <div class="compare-actions">
+                <button class="btn" id="compareBtn" onclick="compareDicoms()" style="display: none;">
+                    Compare Files
                 </button>
             </div>
         </div>
@@ -418,6 +649,26 @@
         const searchInput = document.getElementById('searchInput');
 
         let currentDicomData = null;
+        let currentMode = 'single';
+
+        // Compare mode variables
+        let dicomFile1 = null;
+        let dicomFile2 = null;
+        let dicomData1 = null;
+        let dicomData2 = null;
+        const fileInput1 = document.getElementById('fileInput1');
+        const fileInput2 = document.getElementById('fileInput2');
+        const compareBox1 = document.getElementById('compareBox1');
+        const compareBox2 = document.getElementById('compareBox2');
+        const compareBtn = document.getElementById('compareBtn');
+        const file1Name = document.getElementById('file1Name');
+        const file2Name = document.getElementById('file2Name');
+        let diffFilters = {
+            added: true,
+            removed: true,
+            modified: true,
+            identical: false
+        };
 
         // Drag and drop
         uploadBox.addEventListener('dragover', (e) => {
@@ -790,6 +1041,469 @@
                     }
                 });
             });
+        }
+
+        // Mode switching
+        function switchMode(mode) {
+            currentMode = mode;
+            const uploadSection = document.getElementById('uploadSection');
+            const compareSection = document.getElementById('compareSection');
+            const singleModeBtn = document.getElementById('singleModeBtn');
+            const compareModeBtn = document.getElementById('compareModeBtn');
+
+            if (mode === 'single') {
+                uploadSection.style.display = 'block';
+                compareSection.classList.remove('show');
+                singleModeBtn.classList.add('active');
+                compareModeBtn.classList.remove('active');
+                tagsSection.classList.remove('show');
+            } else {
+                uploadSection.style.display = 'none';
+                compareSection.classList.add('show');
+                singleModeBtn.classList.remove('active');
+                compareModeBtn.classList.add('active');
+                tagsSection.classList.remove('show');
+            }
+
+            error.classList.remove('show');
+            loading.classList.remove('show');
+        }
+
+        // File input handlers for compare mode
+        fileInput1.addEventListener('change', async (e) => {
+            if (e.target.files.length > 0) {
+                await handleCompareFile(e.target.files[0], 1);
+            }
+        });
+
+        fileInput2.addEventListener('change', async (e) => {
+            if (e.target.files.length > 0) {
+                await handleCompareFile(e.target.files[0], 2);
+            }
+        });
+
+        // Drag and drop for compare boxes
+        [compareBox1, compareBox2].forEach((box, index) => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('dragover');
+            });
+
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('dragover');
+            });
+
+            box.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                box.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    await handleCompareFile(files[0], index + 1);
+                }
+            });
+
+            box.addEventListener('click', () => {
+                if (index === 0) {
+                    fileInput1.click();
+                } else {
+                    fileInput2.click();
+                }
+            });
+        });
+
+        async function handleCompareFile(file, fileNumber) {
+            try {
+                error.classList.remove('show');
+                loading.classList.add('show');
+                loading.innerHTML = '<div class="spinner"></div><p>Loading DICOM file ' + fileNumber + '...</p>';
+
+                const arrayBuffer = await file.arrayBuffer();
+                const byteArray = new Uint8Array(arrayBuffer);
+                const dataSet = dcmjs.data.DicomMessage.readFile(byteArray);
+                const dict = dataSet.dict;
+
+                if (fileNumber === 1) {
+                    dicomFile1 = file;
+                    dicomData1 = dict;
+                    file1Name.textContent = file.name;
+                    compareBox1.classList.add('loaded');
+                } else {
+                    dicomFile2 = file;
+                    dicomData2 = dict;
+                    file2Name.textContent = file.name;
+                    compareBox2.classList.add('loaded');
+                }
+
+                loading.classList.remove('show');
+
+                // Show compare button if both files are loaded
+                if (dicomData1 && dicomData2) {
+                    compareBtn.style.display = 'inline-block';
+                }
+
+            } catch (err) {
+                loading.classList.remove('show');
+                error.textContent = `Error reading file ${fileNumber}: ${err.message}`;
+                error.classList.add('show');
+                console.error(err);
+            }
+        }
+
+        function compareDicoms() {
+            if (!dicomData1 || !dicomData2) {
+                error.textContent = 'Please load both DICOM files first';
+                error.classList.add('show');
+                return;
+            }
+
+            error.classList.remove('show');
+            loading.classList.add('show');
+            loading.innerHTML = '<div class="spinner"></div><p>Comparing DICOM files...</p>';
+
+            setTimeout(() => {
+                try {
+                    const diffs = computeDifferences(dicomData1, dicomData2);
+                    displayComparison(diffs);
+                    loading.classList.remove('show');
+                    tagsSection.classList.add('show');
+                } catch (err) {
+                    loading.classList.remove('show');
+                    error.textContent = `Error comparing files: ${err.message}`;
+                    error.classList.add('show');
+                    console.error(err);
+                }
+            }, 100);
+        }
+
+        function computeDifferences(dict1, dict2, level = 0) {
+            const diffs = [];
+            const allTags = new Set([...Object.keys(dict1), ...Object.keys(dict2)]);
+
+            allTags.forEach(tag => {
+                const tag1 = dict1[tag];
+                const tag2 = dict2[tag];
+
+                let diffType;
+                let sequenceItems = null;
+
+                if (!tag1) {
+                    diffType = 'added'; // Only in file 2
+                } else if (!tag2) {
+                    diffType = 'removed'; // Only in file 1
+                } else {
+                    // Both exist, check if it's a sequence
+                    const vr1 = tag1.vr;
+                    const vr2 = tag2.vr;
+
+                    if ((vr1 === 'SQ' || vr2 === 'SQ') && (tag1.Value || tag2.Value)) {
+                        // It's a sequence, compare items
+                        const items1 = tag1.Value || [];
+                        const items2 = tag2.Value || [];
+
+                        sequenceItems = compareSequenceItems(items1, items2, level + 1);
+
+                        // Determine overall sequence diff type
+                        if (items1.length !== items2.length) {
+                            diffType = 'modified';
+                        } else {
+                            // Check if any item has differences
+                            const hasAnyDiff = sequenceItems.some(item =>
+                                item.diffs && item.diffs.some(d => d.type !== 'identical')
+                            );
+                            diffType = hasAnyDiff ? 'modified' : 'identical';
+                        }
+                    } else {
+                        // Regular tag, compare values
+                        const value1 = formatValue(tag1);
+                        const value2 = formatValue(tag2);
+                        diffType = (value1 === value2) ? 'identical' : 'modified';
+                    }
+                }
+
+                diffs.push({
+                    tag: tag,
+                    type: diffType,
+                    data1: tag1,
+                    data2: tag2,
+                    sequenceItems: sequenceItems,
+                    level: level
+                });
+            });
+
+            // Sort by tag number
+            diffs.sort((a, b) => a.tag.localeCompare(b.tag));
+
+            return diffs;
+        }
+
+        function compareSequenceItems(items1, items2, level) {
+            const maxItems = Math.max(items1.length, items2.length);
+            const itemComparisons = [];
+
+            for (let i = 0; i < maxItems; i++) {
+                const item1 = items1[i];
+                const item2 = items2[i];
+
+                let itemDiffType;
+                let diffs = null;
+
+                if (!item1) {
+                    itemDiffType = 'added'; // Only in sequence 2
+                } else if (!item2) {
+                    itemDiffType = 'removed'; // Only in sequence 1
+                } else {
+                    // Both items exist, compare recursively
+                    diffs = computeDifferences(item1, item2, level);
+
+                    // Determine item diff type based on child diffs
+                    const hasAnyDiff = diffs.some(d => d.type !== 'identical');
+                    itemDiffType = hasAnyDiff ? 'modified' : 'identical';
+                }
+
+                itemComparisons.push({
+                    index: i,
+                    type: itemDiffType,
+                    item1: item1,
+                    item2: item2,
+                    diffs: diffs
+                });
+            }
+
+            return itemComparisons;
+        }
+
+        function displayComparison(diffs) {
+            tagsContainer.innerHTML = '';
+
+            // Create diff header with legend and filters
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'diff-header';
+            headerDiv.innerHTML = `
+                <div class="diff-legend">
+                    <strong>Legend:</strong>
+                    <div class="diff-legend-item">
+                        <div class="diff-legend-box added"></div>
+                        <span>Only in File 2</span>
+                    </div>
+                    <div class="diff-legend-item">
+                        <div class="diff-legend-box removed"></div>
+                        <span>Only in File 1</span>
+                    </div>
+                    <div class="diff-legend-item">
+                        <div class="diff-legend-box modified"></div>
+                        <span>Different Values</span>
+                    </div>
+                </div>
+                <div class="diff-filters">
+                    <button class="filter-btn ${diffFilters.removed ? 'active' : ''}" onclick="toggleDiffFilter('removed')">
+                        Only in File 1
+                    </button>
+                    <button class="filter-btn ${diffFilters.added ? 'active' : ''}" onclick="toggleDiffFilter('added')">
+                        Only in File 2
+                    </button>
+                    <button class="filter-btn ${diffFilters.modified ? 'active' : ''}" onclick="toggleDiffFilter('modified')">
+                        Modified
+                    </button>
+                    <button class="filter-btn ${diffFilters.identical ? 'active' : ''}" onclick="toggleDiffFilter('identical')">
+                        Identical
+                    </button>
+                </div>
+            `;
+            tagsContainer.appendChild(headerDiv);
+
+            // Create tags tree
+            const treeDiv = document.createElement('div');
+            treeDiv.className = 'tags-tree';
+
+            diffs.forEach(diff => {
+                if (!diffFilters[diff.type]) return;
+
+                const line = renderComparisonTag(diff);
+                treeDiv.innerHTML += line;
+            });
+
+            tagsContainer.appendChild(treeDiv);
+        }
+
+        function renderComparisonTag(diff) {
+            const tagNum = formatTag(diff.tag);
+            const tagName = getTagName(diff.tag);
+            const indent = '  '.repeat(diff.level || 0);
+            let diffClass = '';
+            let html = '';
+
+            switch (diff.type) {
+                case 'added':
+                    diffClass = 'diff-added';
+                    break;
+                case 'removed':
+                    diffClass = 'diff-removed';
+                    break;
+                case 'modified':
+                    diffClass = 'diff-modified';
+                    break;
+                case 'identical':
+                    diffClass = 'diff-identical';
+                    break;
+            }
+
+            const vr1 = diff.data1?.vr || '';
+            const vr2 = diff.data2?.vr || '';
+            const vr = vr1 || vr2;
+
+            // Check if it's a sequence
+            if (vr === 'SQ' && diff.sequenceItems) {
+                const sequenceId = `seq_diff_${diff.tag}_${Math.random().toString(36).substr(2, 9)}`;
+                const items1Count = diff.data1?.Value?.length || 0;
+                const items2Count = diff.data2?.Value?.length || 0;
+
+                html += `<div class="tag-line ${diffClass}" data-search="${tagNum} ${tagName}">`;
+                html += `<span class="tag-indent">${indent}</span>`;
+                html += `<span class="collapse-btn" onclick="toggleCollapse('${sequenceId}', this)">▶</span>`;
+                html += `<span class="tag-number">${tagNum}</span>`;
+                html += `<span class="tag-vr">${vr}</span>`;
+                html += `<span class="tag-name">${tagName}</span>`;
+
+                if (diff.type === 'added') {
+                    html += `<span class="tag-value sequence-marker">[Sequence: ${items2Count} item(s) - Only in File 2]</span>`;
+                } else if (diff.type === 'removed') {
+                    html += `<span class="tag-value sequence-marker">[Sequence: ${items1Count} item(s) - Only in File 1]</span>`;
+                } else if (diff.type === 'modified') {
+                    html += `<span class="tag-value sequence-marker">[Sequence: File 1 has ${items1Count} item(s), File 2 has ${items2Count} item(s)]</span>`;
+                } else {
+                    html += `<span class="tag-value sequence-marker">[Sequence: ${items1Count} item(s) - Identical]</span>`;
+                }
+
+                html += `</div>`;
+
+                // Render sequence items (collapsed by default)
+                html += `<div id="${sequenceId}" class="collapsed-content">`;
+                diff.sequenceItems.forEach(itemComp => {
+                    html += renderSequenceItemComparison(itemComp, diff.level + 1, tagName);
+                });
+                html += `</div>`;
+
+            } else {
+                // Regular tag
+                html += `<div class="tag-line ${diffClass}" data-search="${tagNum} ${tagName}">`;
+                html += `<span class="tag-indent">${indent}</span>`;
+                html += `<span class="tag-number">${tagNum}</span>`;
+                html += `<span class="tag-vr">${vr}</span>`;
+                html += `<span class="tag-name">${tagName}</span>`;
+
+                if (diff.type === 'modified') {
+                    const value1 = formatValue(diff.data1);
+                    const value2 = formatValue(diff.data2);
+                    html += `<div class="diff-value-container">`;
+                    html += `<div class="diff-value">`;
+                    html += `<div class="diff-value-label">File 1:</div>`;
+                    html += `<span class="tag-value">${value1}</span>`;
+                    html += `</div>`;
+                    html += `<div class="diff-value">`;
+                    html += `<div class="diff-value-label">File 2:</div>`;
+                    html += `<span class="tag-value">${value2}</span>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                } else if (diff.type === 'added') {
+                    const value2 = formatValue(diff.data2);
+                    html += `<span class="tag-value">${value2}</span>`;
+                } else if (diff.type === 'removed') {
+                    const value1 = formatValue(diff.data1);
+                    html += `<span class="tag-value">${value1}</span>`;
+                } else {
+                    const value = formatValue(diff.data1 || diff.data2);
+                    html += `<span class="tag-value">${value}</span>`;
+                }
+
+                html += `</div>`;
+            }
+
+            return html;
+        }
+
+        function renderSequenceItemComparison(itemComp, level, parentName) {
+            const indent = '  '.repeat(level);
+            const itemId = `item_diff_${itemComp.index}_${Math.random().toString(36).substr(2, 9)}`;
+            let html = '';
+            let diffClass = '';
+
+            switch (itemComp.type) {
+                case 'added':
+                    diffClass = 'diff-added';
+                    break;
+                case 'removed':
+                    diffClass = 'diff-removed';
+                    break;
+                case 'modified':
+                    diffClass = 'diff-modified';
+                    break;
+                case 'identical':
+                    diffClass = 'diff-identical';
+                    break;
+            }
+
+            html += `<div class="tag-line ${diffClass}" data-search="Item #${itemComp.index + 1} ${parentName}">`;
+            html += `<span class="tag-indent">${indent}</span>`;
+            html += `<span class="collapse-btn" onclick="toggleCollapse('${itemId}', this)">▶</span>`;
+            html += `<span class="item-marker">Item #${itemComp.index + 1}`;
+
+            if (itemComp.type === 'added') {
+                html += ` (Only in File 2)`;
+            } else if (itemComp.type === 'removed') {
+                html += ` (Only in File 1)`;
+            } else if (itemComp.type === 'modified') {
+                html += ` (Modified)`;
+            }
+
+            html += `</span></div>`;
+
+            // Item content (collapsed by default)
+            html += `<div id="${itemId}" class="collapsed-content">`;
+
+            if (itemComp.diffs) {
+                // Render child tags
+                itemComp.diffs.forEach(childDiff => {
+                    html += renderComparisonTag(childDiff);
+                });
+            } else if (itemComp.item1) {
+                // Only in file 1 - show all tags from item1
+                const sortedTags = Object.keys(itemComp.item1).sort();
+                sortedTags.forEach(tag => {
+                    html += renderComparisonTag({
+                        tag: tag,
+                        type: 'removed',
+                        data1: itemComp.item1[tag],
+                        data2: null,
+                        level: level + 1
+                    });
+                });
+            } else if (itemComp.item2) {
+                // Only in file 2 - show all tags from item2
+                const sortedTags = Object.keys(itemComp.item2).sort();
+                sortedTags.forEach(tag => {
+                    html += renderComparisonTag({
+                        tag: tag,
+                        type: 'added',
+                        data1: null,
+                        data2: itemComp.item2[tag],
+                        level: level + 1
+                    });
+                });
+            }
+
+            html += `</div>`;
+
+            return html;
+        }
+
+        function toggleDiffFilter(filterType) {
+            diffFilters[filterType] = !diffFilters[filterType];
+
+            // Re-render comparison with new filters
+            if (dicomData1 && dicomData2) {
+                const diffs = computeDifferences(dicomData1, dicomData2);
+                displayComparison(diffs);
+            }
         }
     </script>
 </body>
